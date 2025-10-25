@@ -5,3 +5,4 @@ google-generativeai
 SQLAlchemy>=2.0
 psycopg[binary]
 Werkzeug>=2.3
+gunicorn
