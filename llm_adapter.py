@@ -8,8 +8,8 @@ from google.api_core import exceptions as google_exceptions
 
 load_dotenv() # Load environment variables from .env file
 
-# Add comments explaining how to insert API keys
-# API keys should be set in a .env file in the codemind-ai directory, e.g.:
+
+# API keys should be set in a .env file in the Cyfer directory, e.g.:
 # GEMINI_API_KEY="YOUR_GEMINI_API_KEY"
 # OPENAI_API_KEY="YOUR_OPENAI_API_KEY" (optional)
 # ANTHROPIC_API_KEY="YOUR_ANTHROPIC_API_KEY" (optional)

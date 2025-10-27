@@ -22,7 +22,7 @@ from sqlalchemy import (
 from sqlalchemy.engine import Engine
 from sqlalchemy.engine.url import make_url
 
-DEFAULT_SQLITE_URL = "sqlite:///instance/codemind.db"
+DEFAULT_SQLITE_URL = "sqlite:///instance/cyfer.db"
 DATABASE_URL = os.getenv("DATABASE_URL", DEFAULT_SQLITE_URL)
 
 if DATABASE_URL.startswith("postgres://"):

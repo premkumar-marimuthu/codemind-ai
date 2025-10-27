@@ -1,23 +1,23 @@
-# CodeMind AI: Intelligent Code Review Assistant
+# Cyfer: Your Everyday AI Assistant
 
-CodeMind AI is a sophisticated Flask-based web application designed to revolutionize the code review process. It provides developers with an intelligent, conversational AI assistant that offers real-time code analysis, suggestions, and explanations. With a focus on persistent chat history and an intuitive user interface, CodeMind AI streamlines collaboration and enhances code quality.
+Cyfer is a sophisticated Flask-based web application designed to be your intelligent, conversational AI assistant for a wide range of day-to-day tasks. It provides real-time information, answers questions, and engages in general conversation. With a focus on persistent chat history and an intuitive user interface, Cyfer streamlines your daily interactions and enhances productivity.
 
 The application leverages a robust backend, supporting both Neon-hosted PostgreSQL for scalable, durable storage and local SQLite for development flexibility. Its multi-session memory ensures that every review session maintains full context, allowing for a seamless and continuous dialogue about your codebase. The polished UI, adaptable to both dark and light themes, provides a modern and responsive experience across various devices.
 
 ## Key Features
 
-- **Conversational AI Code Reviews:** Engage in natural language conversations with an AI assistant to get instant feedback, identify potential issues, and understand complex code sections.
+- **Conversational AI Assistant:** Engage in natural language conversations with an AI assistant to get instant answers, information, and assistance with various tasks.
 - **Persistent Chat History:** All review sessions and messages are securely stored, allowing you to revisit past discussions and track the evolution of your code over time.
 - **Multi-Session Memory:** Each chat session maintains its own independent history, ensuring that the AI's responses are always relevant to the specific code review context.
 - **Contextual Code Analysis with Diffs:** The AI intelligently replays earlier prompts and highlights key code changes through integrated diffs, providing precise and actionable insights.
 - **Flexible Database Integration:**
     - **Neon PostgreSQL Backend:** Seamlessly integrates with Neon for a powerful, scalable, and cloud-hosted PostgreSQL database, ensuring high availability and data durability.
-    - **Local SQLite Fallback:** Automatically switches to a local SQLite database (`instance/codemind.db`) if a `DATABASE_URL` is not configured, perfect for local development and testing.
+- **Local SQLite Fallback:** Automatically switches to a local SQLite database (`instance/cyfer.db`) if a `DATABASE_URL` is not configured, perfect for local development and testing.
 - **Modern and Responsive User Interface:**
     - **Enhanced Composer UI:** A clean and intuitive interface with aligned controls for an optimal user experience.
     - **Dynamic Theme Toggle:** Effortlessly switch between dark and light themes to suit your preference and working environment.
     - **Responsive Layout:** Designed to provide a consistent and enjoyable experience on both desktop and tablet devices.
-- **Easy Setup and Deployment:** Simple environment variable configuration and clear setup instructions make it easy to get CodeMind AI up and running locally or deployed to production.
+- **Easy Setup and Deployment:** Simple environment variable configuration and clear setup instructions make it easy to get Cyfer up and running locally or deployed to production.
 - **Extensible LLM Support:** Configurable to work with various Large Language Model providers (Gemini, OpenAI, Anthropic) via API keys, offering flexibility in AI capabilities.
 
 ## Prerequisites
@@ -49,7 +49,7 @@ postgresql+psycopg://<user>:<password>@<host>/<database>?sslmode=require
 
 The app automatically rewrites `postgres://` or `postgresql://` URLs to append `+psycopg`, so you can paste the standard Neon connection string as-is.
 
-If `DATABASE_URL` is omitted, the app stores data in `instance/codemind.db` (SQLite).
+If `DATABASE_URL` is omitted, the app stores data in `instance/cyfer.db` (SQLite).
 
 ## Setup
 

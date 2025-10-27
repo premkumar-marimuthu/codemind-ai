@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CodeMind AI</title>
+    <title>Cyfer</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='switch.css') }}">
 </head>
@@ -11,23 +11,23 @@
     <div class="app-shell">
         <aside class="sidebar">
             <div class="sidebar-header">
-                <div class="logo-mark">CM</div>
+                <div class="logo-mark">CY</div>
                 <div>
-                    <h1>CodeMind AI</h1>
-                    <p class="sidebar-tagline">Smarter code reviews</p>
+                    <h1>Cyfer</h1>
+                    <p class="sidebar-tagline">Your everyday AI assistant</p>
                 </div>
             </div>
-            <button id="new-session-button" class="sidebar-button">+ New review</button>
+            <button id="new-session-button" class="sidebar-button">+ New chat</button>
             <div class="sidebar-section">
-                <h2>Your reviews</h2>
-                <div id="chat-list" class="chat-list" role="listbox" aria-label="Saved review chats"></div>
-                <div id="chat-list-empty" class="chat-list-empty">No chats yet. Start by creating a new review.</div>
+                <h2>Your chats</h2>
+                <div id="chat-list" class="chat-list" role="listbox" aria-label="Saved chats"></div>
+                <div id="chat-list-empty" class="chat-list-empty">No chats yet. Start by creating a new chat.</div>
             </div>
             <div class="sidebar-section">
                 <h2>How it works</h2>
                 <ul>
-                    <li>Paste the code you want reviewed.</li>
-                    <li>Pick the language for better context.</li>
+                    <li>Ask questions or provide tasks.</li>
+                    <li>Cyfer will assist you with information and solutions.</li>
                     <li>Provide your own API key if you prefer another model.</li>
                 </ul>
             </div>
@@ -39,11 +39,29 @@
 
         <main class="main-pane">
             <header class="top-bar">
-                <div class="top-bar-title">Chat review</div>
+                <div class="top-bar-left">
+                    <button
+                        id="sidebar-toggle-button"
+                        class="sidebar-toggle"
+                        type="button"
+                        aria-label="Hide sidebar"
+                        aria-expanded="true"
+                        data-icon-expanded="{{ url_for('static', filename='collapse-sidebar.svg') }}"
+                        data-icon-collapsed="{{ url_for('static', filename='show-sidebar.svg') }}"
+                    >
+                        <img
+                            id="sidebar-toggle-icon"
+                            src="{{ url_for('static', filename='collapse-sidebar.svg') }}"
+                            alt=""
+                            aria-hidden="true"
+                        />
+                    </button>
+                    <div class="top-bar-title">Chat</div>
+                </div>
                 <div class="top-bar-actions">
                     <div id="status-indicator" class="status-indicator hidden">
                         <span class="status-dot"></span>
-                        Analyzing&hellip;
+                        Thinking&hellip;
                     </div>
                     <button id="auth-button" class="auth-button" type="button" data-authenticated="{{ 'true' if auth_email else 'false' }}" data-email="{{ auth_email or '' }}">
                         {{ auth_email or 'Sign in' }}
@@ -58,82 +76,104 @@
             <section id="chat-log" class="chat-log" aria-live="polite">
                 <div id="empty-state" class="empty-state">
                     <h2>Ready when you are</h2>
-                    <p>Drop your code below and CodeMind will walk you through improvements like a pair programmer.</p>
+                    <p>Ask anything below and Cyfer will assist you with a wide range of tasks.</p>
                 </div>
             </section>
 
-            <form id="analyze-form" class="composer" novalidate>
-                <label for="code-input" class="composer-label">Paste your code snippet</label>
-                <div class="composer-editor">
-                    <textarea id="code-input" placeholder="Paste your code here to get a detailed review..." spellcheck="false"></textarea>
-                </div>
-                <div class="composer-controls">
-                    <div class="control-group select-group">
-                        <label>Language</label>
-                        <div class="dropdown-container">
-                            <div class="button" onclick="document.body.classList.toggle('expanded')">
-                                <div class="places" id="selected-language-display">Python</div>
-                            </div>
-                            <div class="menu">
-                                <svg class="shadow" width="375" height="322" viewBox="0 0 375 322">
-                                    <defs>
-                                        <filter
-                                                id="blur"
-                                                x="-0.053211679"
-                                                width="1.1064234"
-                                                y="-0.068773585"
-                                                height="1.1375472">
-                                            <feGaussianBlur
-                                                            inkscape:collect="always"
-                                                            stdDeviation="6.075"
-                                                            id="feGaussianBlur1076" />
-                                        </filter>
-                                    </defs>
-                                    <g transform="translate(0,120)">
+            <section class="chat-input-section">
+                <form id="analyze-form" class="composer" novalidate>
+                    <div class="chat-input-container">
+                        <div class="chat-input-bar">
+                            <button type="button" class="add-button">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+                                    <path fill="none" d="M0 0h24v24H0z"></path>
+                                    <path fill="currentColor" d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z"></path>
+                                </svg>
+                            </button>
+                            <input type="text" id="chat-input" placeholder="Ask anything" spellcheck="false" class="chat-input-field">
+                            <button
+                                id="settings-handle-button"
+                                type="button"
+                                class="settings-handle-button"
+                                aria-controls="full-analyze-form-settings"
+                                aria-expanded="false"
+                            >
+                                <img src="{{ url_for('static', filename='settings_handle.svg') }}" alt="Settings" />
+                            </button>
+                        </div>
+                        <button id="analyze-button" type="submit" class="send-button">
+                            <div class="analyze-svg-wrapper-1">
+                                <div class="analyze-svg-wrapper">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 24 24"
+                                        width="24"
+                                        height="24"
+                                    >
+                                        <path fill="none" d="M0 0h24v24H0z"></path>
                                         <path
-                                              style="opacity:0.14;fill:#0e232e;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;filter:url(#blur)"
-                                              d="M 187.5 59.5 L 176.5 70.5 L 61.107422 70.5 C 55.231364 70.5 50.5 75.229411 50.5 81.105469 L 50.5 260.89258 C 50.5 266.76864 55.231364 271.5 61.107422 271.5 L 187.5 271.5 L 313.89453 271.5 C 319.77059 271.5 324.5 266.76864 324.5 260.89258 L 324.5 81.105469 C 324.5 75.229411 319.77059 70.5 313.89453 70.5 L 198.5 70.5 L 187.5 59.5 z "
-                                              transform="translate(0,-120)"
-                                              id="path967" />
-                                    </g>
-                                </svg>
-                                <svg class="container" width="275" height="222" viewBox="0 0 275 222">
-                                    <g transform="translate(0,20)">
-                                        <path class="border1" fill="transparent" stroke-width="1.5" d="m 137.5,201.5003 h -126.393699 c -5.8760576,0 -10.606602,-4.73054 -10.606602,-10.6066 v -179.787399 c 0,-5.8760576 4.7305444,-10.606602 10.606602,-10.606602 h 115.393699 l 11,-10.999699"/>
-                                        <path class="border2" fill="transparent" stroke-width="1.5" d="m 137.5,-10.5 11,10.999699 h 115.3937 c 5.87606,0 10.6066,4.7305444 10.6066,10.606602 v 179.787399 c 0,5.87606 -4.73054,10.6066 -10.6066,10.6066 h -126.3937"/>
-                                    </g>
-                                </svg>
-                                <div class="contents" id="language-options-container">
-                                    <!-- Language options will be dynamically inserted here by JavaScript -->
+                                            fill="currentColor"
+                                            d="M1.946 9.315c-.522-.174-.527-.455.01-.634l19.087-6.362c.529-.176.832.12.684.638l-5.454 19.086c-.15.529-.455.547-.679.045L12 14l6-8-8 6-8.054-2.685z"
+                                        ></path>
+                                    </svg>
+                                    <span>Send</span>
+                                </div>
+                            </div>
+                        </button>
+                    </div>
+                    <div
+                        id="full-analyze-form-settings"
+                        class="full-analyze-form-settings"
+                        aria-hidden="true"
+                    >
+                        <div class="control-group select-group">
+                            <label>Intent (Optional)</label>
+                            <div class="dropdown-container">
+                                <div class="button" onclick="document.body.classList.toggle('expanded')">
+                                    <div class="places" id="selected-intent-display">Default</div>
+                                </div>
+                                <div class="menu">
+                                    <svg class="shadow" width="375" height="322" viewBox="0 0 375 322">
+                                        <defs>
+                                            <filter
+                                                    id="blur"
+                                                    x="-0.053211679"
+                                                    width="1.1064234"
+                                                    y="-0.068773585"
+                                                    height="1.1375472">
+                                                <feGaussianBlur
+                                                                inkscape:collect="always"
+                                                                stdDeviation="6.075"
+                                                                id="feGaussianBlur1076" />
+                                            </filter>
+                                        </defs>
+                                        <g transform="translate(0,120)">
+                                            <path
+                                                style="opacity:0.14;fill:#0e232e;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;filter:url(#blur)"
+                                                d="M 187.5 59.5 L 176.5 70.5 L 61.107422 70.5 C 55.231364 70.5 50.5 75.229411 50.5 81.105469 L 50.5 260.89258 C 50.5 266.76864 55.231364 271.5 61.107422 271.5 L 187.5 271.5 L 313.89453 271.5 C 319.77059 271.5 324.5 266.76864 324.5 260.89258 L 324.5 81.105469 C 324.5 75.229411 319.77059 70.5 313.89453 70.5 L 198.5 70.5 L 187.5 59.5 z "
+                                                transform="translate(0,-120)"
+                                                id="path967" />
+                                        </g>
+                                    </svg>
+                                    <svg class="container" width="275" height="222" viewBox="0 0 275 222">
+                                        <g transform="translate(0,20)">
+                                            <path class="border1" fill="transparent" stroke-width="1.5" d="m 137.5,201.5003 h -126.393699 c -5.8760576,0 -10.606602,-4.73054 -10.606602,-10.6066 v -179.787399 c 0,-5.8760576 4.7305444,-10.606602 10.606602,-10.606602 h 115.393699 l 11,-10.999699"/>
+                                            <path class="border2" fill="transparent" stroke-width="1.5" d="m 137.5,-10.5 11,10.999699 h 115.3937 c 5.87606,0 10.6066,4.7305444 10.6066,10.606602 v 179.787399 c 0,5.87606 -4.73054,10.6066 -10.6066,10.6066 h -126.3937"/>
+                                        </g>
+                                    </svg>
+                                    <div class="contents" id="intent-options-container">
+                                        <!-- Intent options will be dynamically inserted here by JavaScript -->
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="control-group">
-                        <label for="api-key-input">API key (optional)</label>
-                        <input type="text" id="api-key-input" placeholder="Paste an OpenAI or Claude key">
-                    </div>
-                    <button id="analyze-button" type="submit">
-                        <div class="analyze-svg-wrapper-1">
-                            <div class="analyze-svg-wrapper">
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 24 24"
-                                    width="24"
-                                    height="24"
-                                >
-                                    <path fill="none" d="M0 0h24v24H0z"></path>
-                                    <path
-                                        fill="currentColor"
-                                        d="M1.946 9.315c-.522-.174-.527-.455.01-.634l19.087-6.362c.529-.176.832.12.684.638l-5.454 19.086c-.15.529-.455.547-.679.045L12 14l6-8-8 6-8.054-2.685z"
-                                    ></path>
-                                </svg>
-                            </div>
+                        <div class="control-group">
+                            <label for="api-key-input">API key (optional)</label>
+                            <input type="text" id="api-key-input" placeholder="Paste an OpenAI or Claude key">
                         </div>
-                        <span>Send</span>
-                    </button>
-                </div>
-            </form>
+                    </div>
+                </form>
+            </section>
         </main>
     </div>
 

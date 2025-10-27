@@ -11,8 +11,8 @@
     --text-primary: #f8f9fb;
     --text-secondary: #98a1b3;
     --accent: #8b61c2;
-    --accent-dark: #7c34db;
-    --user-bubble: rgba(16, 163, 127, 0.08);
+    --accent-dark: rgb(124, 52, 219);
+    --user-bubble: rgba(124, 52, 219, 0.08);
     --assistant-bubble: rgba(255, 255, 255, 0.04);
     --code-bg: #0f172a;
     --surface-subtle: rgba(255, 255, 255, 0.02);
@@ -29,10 +29,11 @@
     --button-disabled-bg: rgba(255, 255, 255, 0.08);
     --button-disabled-color: rgba(255, 255, 255, 0.4);
     --strong-color: #ffffff;
-    --user-border: rgba(16, 163, 127, 0.25);
+    --user-border: rgba(124, 52, 219, 0.25);
     --user-avatar-text: #03251c;
     --select-arrow: rgba(248, 249, 251, 0.78);
     --select-arrow-active: var(--accent);
+    --shadow-top-bar: rgba(0, 0, 0, 0.5);
     font-family: "Open Sans", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
@@ -45,8 +46,14 @@ body.dark-theme {
 }
 
 button {
-    font-family: inherit;
-    font-weight: 800;
+    font-family: "Open Sans", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: 600;
+    color: inherit;
+}
+
+html, body {
+    height: 100%;
+    overflow: hidden; /* Prevent main document scroll */
 }
 
 body {
@@ -56,7 +63,7 @@ body {
     background-repeat: no-repeat;
     background-size: cover;
     color: var(--text-primary);
-    min-height: 100vh;
+    height: 100%;
     transition: background-color 0.35s ease, color 0.35s ease;
     caret-color: var(--accent);
     font-family: "Open Sans", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; /* Ensure Open Sans is applied */
@@ -75,7 +82,7 @@ body.light-theme {
     --text-secondary: #5f6a82;
     --accent: #8b61c2;
     --accent-dark: #7c34db;
-    --user-bubble: rgba(16, 163, 127, 0.12);
+    --user-bubble: rgba(124, 52, 219, 0.12);
     --assistant-bubble: rgba(15, 23, 42, 0.05);
     --code-bg: #f1f4fb;
     --surface-subtle: rgba(15, 23, 42, 0.04);
@@ -92,10 +99,11 @@ body.light-theme {
     --button-disabled-bg: rgba(15, 23, 42, 0.08);
     --button-disabled-color: rgba(15, 23, 42, 0.45);
     --strong-color: #182339;
-    --user-border: rgba(16, 128, 110, 0.32);
+    --user-border: rgba(124, 52, 219, 0.32);
     --user-avatar-text: #ffffff;
     --select-arrow: rgba(21, 27, 44, 0.6);
     --select-arrow-active: var(--accent);
+    --shadow-top-bar: rgba(15, 23, 42, 0.08);
 }
 
 body.light-theme #analyze-button {
@@ -104,18 +112,25 @@ body.light-theme #analyze-button {
 
 .app-shell {
     display: flex;
-    min-height: 100vh;
+    height: 100%; /* Changed from min-height to height */
     width: 100%;
+    overflow: hidden; /* Prevent main scroll on app-shell */
 }
 
 .sidebar {
-    width: 260px;
+    width: 360px;
+    flex: 0 0 360px;
     background: var(--bg-sidebar);
     border-right: 1px solid var(--border);
     padding: 24px 20px;
     display: flex;
     flex-direction: column;
     gap: 24px;
+    height: 100%; /* Set height to 100% of parent (.app-shell) */
+    overflow-y: auto; /* Enable vertical scrolling */
+    overflow-x: hidden;
+    transition: width 0.4s ease, padding 0.4s ease, opacity 0.3s ease, border-right-color 0.4s ease;
+    will-change: width, padding;
 }
 
 .sidebar-header {
@@ -257,6 +272,46 @@ body.light-theme #analyze-button {
     z-index: 10;
 }
 
+.top-bar-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.sidebar-toggle {
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    padding: 6px;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    color: var(--text-secondary);
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.sidebar-toggle:hover {
+    background-color: var(--surface-subtle);
+    border-color: var(--border);
+    color: var(--text-primary);
+}
+
+.sidebar-toggle:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+.sidebar-toggle img {
+    width: 24px;
+    height: 24px;
+    display: block;
+    filter: invert(1); /* Make SVG white in dark theme */
+}
+
+body.light-theme .sidebar-toggle img {
+    filter: invert(0); /* Revert to original color in light theme */
+}
+
 .top-bar-title {
     font-weight: 600;
     letter-spacing: 0.05em;
@@ -314,6 +369,17 @@ body.light-theme #analyze-button {
     display: none !important;
 }
 
+.app-shell.sidebar-collapsed .sidebar {
+    width: 0;
+    flex-basis: 0;
+    padding-left: 0;
+    padding-right: 0;
+    opacity: 0;
+    border-right-color: transparent;
+    pointer-events: none;
+    overflow: hidden;
+}
+
 @keyframes pulse {
     0% { opacity: 0.2; transform: scale(0.8); }
     50% { opacity: 1; transform: scale(1); }
@@ -328,6 +394,9 @@ body.light-theme #analyze-button {
     flex-direction: column;
     gap: 18px;
     background: var(--bg-chat);
+    width: 100%;
+    /* max-width: 1500px;
+    align-self: center; */
 }
 
 .empty-state {
@@ -513,68 +582,206 @@ body.light-theme #analyze-button {
     }
 }
 
-.composer {
-    border-top: 1px solid var(--border);
-    padding: 22px 28px 26px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    background: var(--bg-panel);
+.chat-input-section {
     position: sticky;
     bottom: 0;
+    background-color: var(--bg-panel);
+    box-shadow: 0px -10px 20px var(--shadow-top-bar);
+    overflow-x: hidden;
+    will-change: transform;
+}
+
+.composer {
+    border-radius: 45px;
+    padding: 22px 28px;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-panel);
     max-width: 1500px;
     width: 100%;
     margin: 0 auto;
 }
 
-.composer-label {
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
+.chat-input-container {
+    display: flex;
+    gap: 10px; /* Space between input bar and send button */
+    max-height: 60px;
 }
 
-.composer-editor {
+.chat-input-bar {
+    flex: 1; /* Allow the input bar to take available space */
+    display: flex;
+    align-items: center;
     background: var(--surface-subtle);
     border: 1px solid var(--border-strong);
-    border-radius: 18px;
-    padding: 18px 20px;
+    border-radius: 45px; /* Rounded corners */
+    padding: 8px 12px; /* Adjust padding */
+    min-height: 52px; /* Ensure it matches the analyze-button height */
     transition: border-color 0.2s ease;
 }
 
-.composer-editor:focus-within {
+.chat-input-bar:focus-within {
     border-color: var(--accent);
 }
 
-.composer-editor.invalid {
-    border-color: #e5534b;
-    box-shadow: 0 0 0 1px rgba(229, 83, 75, 0.4);
-}
-
-.composer textarea {
-    width: 100%;
-    min-height: 160px;
+.chat-input-field {
+    flex: 1;
     background: transparent;
     border: none;
     color: var(--text-primary);
-    resize: vertical;
     font-size: 1rem;
     line-height: 1.5;
+    padding: 8px 12px; /* Padding inside the input field */
 }
 
-.composer textarea:focus {
+.chat-input-field:focus {
     outline: none;
 }
 
-.composer textarea::placeholder {
+.chat-input-field::placeholder {
     color: var(--text-secondary);
 }
 
-.composer-controls {
+.add-button {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
     display: flex;
-    gap: 14px;
-    align-items: flex-end;
-    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
+}
+
+.add-button:hover {
+    background: var(--surface-muted);
+}
+
+.add-button svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+    filter: invert(1); /* Make SVG white in dark theme */
+}
+
+body.light-theme .add-button svg {
+    filter: invert(0); /* Revert to original color in light theme */
+}
+
+.chat-input-container svg {
+    width: 20px;
+    height: 20px;
+}
+
+.send-button {
+    border: none;
+    background: var(--accent);
+    color: #ffffff;
+    padding: 0;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    /* margin-left: 8px; Removed as it's now handled by chat-input-container gap */
+}
+
+.send-button:hover {
+    box-shadow: 0 4px 8px var(--composer-shadow);
+    transform: scale(1.05);
+}
+
+.send-button:active {
+    transform: scale(0.95);
+}
+
+.send-button:disabled {
+    background: var(--button-disabled-bg);
+    color: var(--button-disabled-color);
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.send-button .analyze-svg-wrapper-1,
+.send-button .analyze-svg-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    height: 100%;
+}
+
+.send-button svg {
+    transform: translateX(0) rotate(0deg) scale(1); /* Reset initial state */
+    transition: transform 0.3s ease-in-out;
+}
+
+.send-button:hover svg {
+    transform: translateX(0) rotate(0deg) scale(1); /* No animation on hover for send button */
+}
+
+.send-button span {
+    display: none; /* Hide "Send" text */
+}
+
+.settings-handle-button {
+    background: transparent; /* Make background transparent */
+    border: none; /* Remove border */
+    padding: 0; /* Remove padding */
+    min-width: 36px; /* Adjust size */
+    min-height: 36px; /* Adjust size */
+    margin-left: 8px; /* Space between input field and settings handle */
+    border-radius: 50%; /* Make it round */
+}
+
+.settings-handle-button:hover {
+    background: var(--surface-muted); /* Add hover background */
+    border-color: transparent; /* Keep border transparent */
+    border-radius: 50%; /* Ensure it stays round */
+}
+
+.settings-handle-button img {
+    width: 20px;
+    height: 20px;
+    display: block;
+    filter: invert(1);
+}
+
+body.light-theme .settings-handle-button img {
+    filter: invert(0);
+}
+
+.full-analyze-form-settings {
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    margin-top: 0;
+    pointer-events: none;
+    transform: translateY(-6px);
+    transition: max-height 0.4s ease, opacity 0.25s ease, margin 0.4s ease, transform 0.4s ease;
+}
+
+.full-analyze-form-settings.is-open {
+    opacity: 1;
+    margin-top: 16px;
+    pointer-events: auto;
+    transform: translateY(0);
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+    min-width: 160px;
 }
 
 .control-group {
@@ -595,9 +802,9 @@ body.light-theme #analyze-button {
 .control-group select,
 .control-group input {
     background: var(--surface-muted);
-    border-radius: 12px;
+    border-radius: 45px;
     border: 1px solid var(--border);
-    padding: 12px 14px;
+    padding: 12px 24px;
     color: var(--text-primary);
     font-size: 0.95rem;
     min-height: 52px;
@@ -653,14 +860,13 @@ body.light-theme #analyze-button {
     border: none;
     background: var(--accent);
     color: #ffffff;
-    border-radius: 16px;
+    border-radius: 45px;
     padding: 0.7em 1em;
     padding-left: 0.9em;
     cursor: pointer;
     font-size: 0.95rem;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     min-width: 140px;
-    min-height: 52px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -876,7 +1082,7 @@ body.auth-modal-open {
 
 .auth-form input {
     background: var(--surface-muted);
-    border-radius: 12px;
+    border-radius: 45px;
     border: 1px solid var(--border);
     padding: 12px 14px;
     color: var(--text-primary);
@@ -899,7 +1105,7 @@ body.auth-modal-open {
     background: var(--accent);
     color: #03120c;
     border: none;
-    border-radius: 12px;
+    border-radius: 45px;
     padding: 12px 18px;
     font-weight: 600;
     font-size: 0.95rem;
@@ -1001,6 +1207,47 @@ body.auth-modal-open {
     }
 }
 
+.chat-input-and-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.chat-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+}
+
+.settings-handle-button {
+    /* background: var(--surface-muted); */
+    /* border: 1px solid var(--border); */
+    padding: 10px;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    min-height: 36px;
+}
+
+/* .settings-handle-button:hover {
+    border-color: var(--accent);
+    background: var(--surface-strong);
+} */
+
+.settings-handle-button img {
+    width: 24px;
+    height: 24px;
+    filter: invert(1); /* Adjust for dark theme if needed, or provide a dark-theme specific SVG */
+}
+
+body.light-theme .settings-handle-button img {
+    filter: invert(0); /* Adjust for light theme */
+}
+
 /* Custom Dropdown Styles */
 .dropdown-container {
   position: relative;
@@ -1012,11 +1259,11 @@ body.auth-modal-open {
 
 .button {
   background: var(--surface-muted);
-  border-radius: 12px;
+  border-radius: 45px;
   cursor: pointer;
     min-height: 52px;
   width: 100%; /* Take full width of its container */
-  padding: 12px 14px; /* Match existing input/select padding */
+  padding: 12px 24px; /* Match existing input/select padding */
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1066,7 +1313,7 @@ body.auth-modal-open {
     overflow-y: auto; /* Enable scrolling for many options */
     margin-top: 0;
     position: absolute;
-    width: 100%; /* Match button width */
+    width: 250px; /* Match button width */
         left: calc(100% + 12px); /* Position to the right of trigger */
         right: auto;
         top: auto;

@@ -10,6 +10,8 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 import database
 import llm_adapter
+from intent_classifier import classify_intent
+from response_refiner import refine_response
 
 load_dotenv()
 
@@ -17,17 +19,21 @@ database.init_db()
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "dev-secret")
 
-SYSTEM_PROMPT_PATH = Path(__file__).parent / "system_prompt.txt"
-MEMORY_WINDOW = 12
+SYSTEM_PROMPTS_DIR = Path(__file__).parent / "system_prompts"
+MEMORY_WINDOW = 24
 MIN_PASSWORD_LENGTH = 8
 
 
-def _read_system_prompt() -> str:
+def _read_system_prompt(intent: str) -> str:
+    """Reads the system prompt for the given intent."""
+    prompt_path = SYSTEM_PROMPTS_DIR / f"{intent}.txt"
+    if not prompt_path.is_file():
+        prompt_path = SYSTEM_PROMPTS_DIR / "default.txt"
+    
     try:
-        text = SYSTEM_PROMPT_PATH.read_text(encoding="utf-8").strip()
-        return text or "You are CodeMind AI, a meticulous code review assistant."
+        return prompt_path.read_text(encoding="utf-8").strip()
     except FileNotFoundError:
-        return "You are CodeMind AI, a meticulous code review assistant."
+        return "You are Cyfer, a helpful AI assistant."
 
 
 def _to_iso(value):
@@ -62,7 +68,7 @@ def _serialize_message(row: Dict) -> Dict:
 
 def _default_chat_title() -> str:
     stamp = datetime.now().strftime("Session %b %d, %H:%M")
-    return f"New review ({stamp})"
+    return f"New chat ({stamp})"
 
 
 def _derive_chat_title(language: str, code: str) -> str:
@@ -72,7 +78,7 @@ def _derive_chat_title(language: str, code: str) -> str:
         if len(snippet) > 60:
             snippet = snippet[:57] + "..."
         return snippet
-    return f"{language.title()} review"
+    return f"{language.title()} chat"
 
 
 def _detect_provider(api_key: Optional[str], requested: Optional[str] = None) -> str:
@@ -122,8 +128,8 @@ def _compose_user_content(language: str, code: str, code_diff: Optional[str], no
     return "\n\n".join(segment for segment in segments if segment.strip())
 
 
-def _build_conversation(history: List[Dict]) -> List[Dict[str, str]]:
-    system_prompt = _read_system_prompt()
+def _build_conversation(history: List[Dict], intent: str) -> List[Dict[str, str]]:
+    system_prompt = _read_system_prompt(intent)
     conversation: List[Dict[str, str]] = [{"role": "system", "content": system_prompt}]
     recent = history[-MEMORY_WINDOW:]
     for message in recent:
@@ -220,6 +226,10 @@ def create_chat_message(chat_id: str):
     )
     code_diff = _compute_diff(previous_code, code)
     user_content = _compose_user_content(language, code, code_diff, notes)
+    
+    # Prioritize user-selected intent, fall back to classification
+    intent = data.get("intent") or classify_intent(user_content)
+    
     user_record = database.add_message(
         chat_id,
         "user",
@@ -232,7 +242,7 @@ def create_chat_message(chat_id: str):
     history.append(user_record)
     _update_chat_metadata(chat, chat_id, language, code)
 
-    conversation = _build_conversation(history)
+    conversation = _build_conversation(history, intent)
 
     def generate():
         assistant_chunks: List[str] = []
@@ -241,18 +251,19 @@ def create_chat_message(chat_id: str):
                 assistant_chunks.append(chunk)
                 yield chunk
         except Exception as exc:
-            error_text = f"\n[CodeMind error]: {exc}\n"
+            error_text = f"\n[Cyfer error]: {exc}\n"
             assistant_chunks.append(error_text)
             yield error_text
         finally:
             final_text = "".join(assistant_chunks).strip()
             if final_text:
+                refined_text = refine_response(final_text, intent)
                 database.add_message(
                     chat_id,
                     "assistant",
-                    final_text,
+                    refined_text,
                     language=language,
-                    display_content=final_text,
+                    display_content=refined_text,
                 )
 
     return Response(generate(), mimetype="text/plain")

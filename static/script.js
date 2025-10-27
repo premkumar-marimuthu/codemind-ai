@@ -1,16 +1,16 @@
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('analyze-form');
-    const codeInput = document.getElementById('code-input');
+    const chatInput = document.getElementById('chat-input'); // Changed from codeInput
     const dropdownButton = document.querySelector('.dropdown-container .button');
-    const selectedLanguageDisplay = document.getElementById('selected-language-display');
-    const languageOptionsContainer = document.getElementById('language-options-container');
+    const selectedIntentDisplay = document.getElementById('selected-intent-display');
+    const intentOptionsContainer = document.getElementById('intent-options-container');
     const apiKeyInput = document.getElementById('api-key-input');
     const analyzeButton = document.getElementById('analyze-button');
     const chatLog = document.getElementById('chat-log');
     const statusIndicator = document.getElementById('status-indicator');
     const emptyState = document.getElementById('empty-state');
     const newSessionButton = document.getElementById('new-session-button');
-    const composerEditor = document.querySelector('.composer-editor');
+    // const composerEditor = document.querySelector('.composer-editor'); // This element no longer exists
     const themeSwitchInput = document.querySelector('.switch input[type="checkbox"]');
     const chatList = document.getElementById('chat-list');
     const chatListEmpty = document.getElementById('chat-list-empty');
@@ -26,27 +26,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const authSignedInPane = document.getElementById('auth-signed-in');
     const authFormsPane = document.getElementById('auth-forms');
     const logoutButton = document.getElementById('logout-button');
+    const settingsHandleButton = document.getElementById('settings-handle-button');
+    const fullAnalyzeFormSettings = document.getElementById('full-analyze-form-settings');
+    const appShell = document.querySelector('.app-shell');
+    const sidebarToggleButton = document.getElementById('sidebar-toggle-button');
+    const sidebarToggleIcon = document.getElementById('sidebar-toggle-icon');
 
-    const themeStorageKey = 'codemind-ai:theme';
+    const themeStorageKey = 'cyfer:theme';
+    const sidebarStorageKey = 'cyfer:sidebar-collapsed';
     const prefersDark = typeof window.matchMedia === 'function'
         ? window.matchMedia('(prefers-color-scheme: dark)')
         : null;
 
-    const languageOptions = [
-        { value: 'python', text: 'Python' },
-        { value: 'javascript', text: 'JavaScript' },
-        { value: 'html', text: 'HTML' },
-        { value: 'css', text: 'CSS' },
-        { value: 'java', text: 'Java' },
-        { value: 'csharp', text: 'C#' },
-        { value: 'go', text: 'Go' },
-        { value: 'ruby', text: 'Ruby' },
-        { value: 'php', text: 'PHP' },
-        { value: 'typescript', text: 'TypeScript' },
-        { value: 'json', text: 'JSON' },
-        { value: 'xml', text: 'XML' },
-        { value: 'markdown', text: 'Markdown' },
-        { value: 'text', text: 'Plain Text' },
+    const intentOptions = [
+        { value: 'default', text: 'Default' },
+        { value: 'coding', text: 'Coding' },
+        { value: 'writing', text: 'Writing' },
+        { value: 'design', text: 'Design' },
+        { value: 'research', text: 'Research' },
+        { value: 'strategy', text: 'Strategy' },
+        { value: 'empathy', text: 'Empathy' },
     ];
 
     const defaultButtonText = analyzeButton.textContent;
@@ -64,13 +63,15 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     initializeTheme();
-    initializeLanguageDropdown();
+    initializeIntentDropdown();
     bootstrapChatStack();
     initializeAuth();
+    initializeSidebarToggle();
 
     form.addEventListener('submit', handleSubmit);
-    codeInput.addEventListener('input', () => composerEditor.classList.remove('invalid'));
+    chatInput.addEventListener('input', () => { /* No invalid class to remove on input bar */ });
     newSessionButton?.addEventListener('click', handleNewSessionClick);
+    settingsHandleButton?.addEventListener('click', toggleFullAnalyzeFormSettings);
 
     function initializeTheme() {
         if (!themeSwitchInput) {
@@ -103,6 +104,108 @@ document.addEventListener('DOMContentLoaded', () => {
                 prefersDark.addListener(handleSystemThemeChange);
             }
         }
+    }
+
+    function initializeSidebarToggle() {
+        if (!appShell || !sidebarToggleButton) {
+            return;
+        }
+
+        if (readSidebarPreference()) {
+            appShell.classList.add('sidebar-collapsed');
+        }
+
+        updateSidebarToggle();
+
+        sidebarToggleButton.addEventListener('click', () => {
+            const isCollapsed = appShell.classList.toggle('sidebar-collapsed');
+            storeSidebarPreference(isCollapsed);
+            updateSidebarToggle();
+        });
+    }
+
+    function updateSidebarToggle() {
+        if (!sidebarToggleButton) {
+            return;
+        }
+
+        const isCollapsed = appShell?.classList.contains('sidebar-collapsed');
+        const iconExpanded = sidebarToggleButton.dataset.iconExpanded;
+        const iconCollapsed = sidebarToggleButton.dataset.iconCollapsed;
+
+        if (sidebarToggleIcon && (iconExpanded || iconCollapsed)) {
+            sidebarToggleIcon.src = isCollapsed ? (iconCollapsed || iconExpanded) : (iconExpanded || iconCollapsed);
+        }
+
+        sidebarToggleButton.setAttribute('aria-expanded', isCollapsed ? 'false' : 'true');
+        sidebarToggleButton.setAttribute('aria-label', isCollapsed ? 'Show sidebar' : 'Hide sidebar');
+        sidebarToggleButton.dataset.state = isCollapsed ? 'collapsed' : 'expanded';
+    }
+
+    function readSidebarPreference() {
+        try {
+            return localStorage.getItem(sidebarStorageKey) === 'true';
+        } catch (error) {
+            return false;
+        }
+    }
+
+    function storeSidebarPreference(collapsed) {
+        try {
+            localStorage.setItem(sidebarStorageKey, collapsed ? 'true' : 'false');
+        } catch (error) {
+            /* no-op */
+        }
+    }
+
+    if (fullAnalyzeFormSettings) {
+        fullAnalyzeFormSettings.classList.remove('hidden');
+        fullAnalyzeFormSettings.classList.remove('is-open');
+        fullAnalyzeFormSettings.setAttribute('aria-hidden', 'true');
+        fullAnalyzeFormSettings.style.maxHeight = '0px';
+        fullAnalyzeFormSettings.addEventListener('transitionend', (event) => {
+            if (event.propertyName !== 'max-height') {
+                return;
+            }
+
+            if (fullAnalyzeFormSettings.classList.contains('is-open')) {
+                fullAnalyzeFormSettings.style.maxHeight = 'none';
+            } else {
+                fullAnalyzeFormSettings.style.maxHeight = '0px';
+            }
+        });
+    }
+
+    if (settingsHandleButton) {
+        settingsHandleButton.setAttribute('aria-expanded', 'false');
+    }
+
+    function toggleFullAnalyzeFormSettings() {
+        if (!fullAnalyzeFormSettings) {
+            return;
+        }
+
+        const isOpen = fullAnalyzeFormSettings.classList.contains('is-open');
+
+        if (isOpen) {
+            const currentHeight = fullAnalyzeFormSettings.scrollHeight;
+            fullAnalyzeFormSettings.style.maxHeight = `${currentHeight}px`;
+            requestAnimationFrame(() => {
+                fullAnalyzeFormSettings.classList.remove('is-open');
+                fullAnalyzeFormSettings.style.maxHeight = '0px';
+            });
+        } else {
+            fullAnalyzeFormSettings.classList.add('is-open');
+            fullAnalyzeFormSettings.style.maxHeight = '0px';
+            requestAnimationFrame(() => {
+                const targetHeight = fullAnalyzeFormSettings.scrollHeight;
+                fullAnalyzeFormSettings.style.maxHeight = `${targetHeight}px`;
+            });
+        }
+
+        const nextState = !isOpen;
+        fullAnalyzeFormSettings.setAttribute('aria-hidden', nextState ? 'false' : 'true');
+        settingsHandleButton?.setAttribute('aria-expanded', nextState ? 'true' : 'false');
     }
 
     function applyTheme(theme, persist = true) {
@@ -355,38 +458,38 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => setAuthFeedback('Please sign in to continue.'), 0);
     }
 
-    function initializeLanguageDropdown() {
-        if (!languageOptionsContainer || !selectedLanguageDisplay) {
+    function initializeIntentDropdown() {
+        if (!intentOptionsContainer || !selectedIntentDisplay) {
             return;
         }
 
-        languageOptionsContainer.innerHTML = '';
+        intentOptionsContainer.innerHTML = '';
 
-        languageOptions.forEach(option => {
+        intentOptions.forEach(option => {
             const row = document.createElement('div');
             row.className = 'row';
             row.textContent = option.text;
             row.dataset.value = option.value;
             row.addEventListener('click', () => {
-                setLanguageSelection(option.value, option.text);
+                setIntentSelection(option.value, option.text);
                 document.body.classList.remove('expanded');
             });
-            languageOptionsContainer.appendChild(row);
+            intentOptionsContainer.appendChild(row);
         });
 
-        const initial = languageOptions[0];
-        setLanguageSelection(initial.value, initial.text);
+        const initial = intentOptions[0];
+        setIntentSelection(initial.value, initial.text);
 
         document.addEventListener('click', (event) => {
-            if (!dropdownButton.contains(event.target) && !languageOptionsContainer.contains(event.target)) {
+            if (!dropdownButton.contains(event.target) && !intentOptionsContainer.contains(event.target)) {
                 document.body.classList.remove('expanded');
             }
         });
     }
 
-    function setLanguageSelection(value, text) {
-        selectedLanguageDisplay.textContent = text;
-        selectedLanguageDisplay.dataset.value = value;
+    function setIntentSelection(value, text) {
+        selectedIntentDisplay.textContent = text;
+        selectedIntentDisplay.dataset.value = value;
     }
 
     async function bootstrapChatStack() {
@@ -513,13 +616,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             const payload = await response.json();
             renderHistory(payload.messages || []);
-            const language = payload.chat?.language;
-            if (language) {
-                const option = languageOptions.find((item) => item.value === language);
+            const intent = payload.chat?.intent;
+            if (intent) {
+                const option = intentOptions.find((item) => item.value === intent);
                 if (option) {
-                    setLanguageSelection(option.value, option.text);
+                    setIntentSelection(option.value, option.text);
                 } else {
-                    setLanguageSelection(language, language.toUpperCase());
+                    setIntentSelection(intent, intent.toUpperCase());
                 }
             }
             if (scroll) {
@@ -551,7 +654,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const role = record.role === 'assistant' ? 'assistant' : 'user';
         const meta = role === 'user'
             ? (record.language ? record.language.toUpperCase() : 'You')
-            : 'CodeMind AI';
+            : 'Cyfer';
         const element = createMessageElement(role, meta);
         const contentEl = element.querySelector('.message-content');
 
@@ -599,8 +702,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const language = selectedLanguageDisplay.dataset.value;
-        const chat = await createChat(language);
+        const intentValue = selectedIntentDisplay.dataset.value;
+        const chat = await createChat(intentValue);
         if (!chat) {
             return;
         }
@@ -608,13 +711,13 @@ document.addEventListener('DOMContentLoaded', () => {
         renderChatList();
         await setActiveChat(chat.id);
         resetComposer();
-        codeInput.focus();
+        chatInput.focus();
     }
 
     function resetComposer() {
-        codeInput.value = '';
+        chatInput.value = '';
         apiKeyInput.value = '';
-        composerEditor.classList.remove('invalid');
+        // composerEditor.classList.remove('invalid'); // This element no longer exists
         chatState.hasMessages = false;
         if (emptyState) {
             emptyState.classList.remove('hidden');
@@ -632,19 +735,19 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const code = codeInput.value.trim();
-        const languageText = selectedLanguageDisplay.textContent;
-        const languageValue = selectedLanguageDisplay.dataset.value;
+        const code = chatInput.value.trim(); // Changed from codeInput
+        const intentText = selectedIntentDisplay.textContent;
+        const intentValue = selectedIntentDisplay.dataset.value;
         const apiKey = apiKeyInput.value.trim();
 
         if (!code) {
-            composerEditor.classList.add('invalid');
-            codeInput.focus();
+            // No invalid class for the new input bar, perhaps a visual cue on the input itself
+            chatInput.focus();
             return;
         }
 
         if (!chatState.activeChatId) {
-            const chat = await createChat(languageValue);
+            const chat = await createChat(intentValue);
             if (!chat) {
                 return;
             }
@@ -654,13 +757,13 @@ document.addEventListener('DOMContentLoaded', () => {
             highlightActiveChat();
         }
 
-        composerEditor.classList.remove('invalid');
+        // composerEditor.classList.remove('invalid'); // This element no longer exists
 
-        const userMessage = createMessageElement('user', languageText.toUpperCase());
+        const userMessage = createMessageElement('user', intentText.toUpperCase());
         const userContent = userMessage.querySelector('.message-content');
-        userContent.innerHTML = `<pre>${escapeHtml(code)}</pre>`;
+        userContent.innerHTML = `<p>${escapeHtml(code)}</p>`; // Changed from pre to p for single line input
 
-        const assistantMessage = createMessageElement('assistant', 'CodeMind AI');
+        const assistantMessage = createMessageElement('assistant', 'Cyfer');
         const assistantContent = assistantMessage.querySelector('.message-content');
         assistantContent.innerHTML = '<p><em>Thinking through your code&hellip;</em></p>';
 
@@ -677,7 +780,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch(`/api/chats/${chatState.activeChatId}/messages`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ code, language: languageValue, api_key: apiKey }),
+                body: JSON.stringify({ code, intent: intentValue, api_key: apiKey }),
             });
 
             if (response.status === 401) {
@@ -724,8 +827,8 @@ document.addEventListener('DOMContentLoaded', () => {
             statusIndicator.classList.add('hidden');
             analyzeButton.disabled = false;
             analyzeButton.textContent = originalButtonText;
-            codeInput.value = '';
-            codeInput.focus();
+            chatInput.value = ''; // Changed from codeInput
+            chatInput.focus(); // Changed from codeInput
         }
     }
 
