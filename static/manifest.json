@@ -1,0 +1,30 @@
+{
+  "name": "Cyfer - AI Assistant",
+  "short_name": "Cyfer",
+  "description": "Your everyday AI assistant for coding, writing, research, and more",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0d1117",
+  "theme_color": "#8b61c2",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/static/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/favicon-32x32.svg",
+      "sizes": "32x32",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/static/favicon-16x16.svg",
+      "sizes": "16x16",
+      "type": "image/svg+xml"
+    }
+  ],
+  "categories": ["productivity", "utilities", "education"],
+  "screenshots": []
+}

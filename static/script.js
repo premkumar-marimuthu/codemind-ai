@@ -111,16 +111,64 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        if (readSidebarPreference()) {
+        const sidebar = document.querySelector('.sidebar');
+        
+        // Create overlay for mobile
+        const overlay = document.createElement('div');
+        overlay.className = 'sidebar-overlay';
+        document.body.appendChild(overlay);
+
+        // Check if on desktop (width > 1100px)
+        const isDesktop = () => window.innerWidth > 1100;
+
+        // Initialize sidebar state
+        if (isDesktop() && readSidebarPreference()) {
             appShell.classList.add('sidebar-collapsed');
         }
 
         updateSidebarToggle();
 
         sidebarToggleButton.addEventListener('click', () => {
-            const isCollapsed = appShell.classList.toggle('sidebar-collapsed');
-            storeSidebarPreference(isCollapsed);
-            updateSidebarToggle();
+            if (isDesktop()) {
+                // Desktop behavior: collapse/expand in place
+                const isCollapsed = appShell.classList.toggle('sidebar-collapsed');
+                storeSidebarPreference(isCollapsed);
+                updateSidebarToggle();
+            } else {
+                // Mobile behavior: slide in/out with overlay
+                sidebar?.classList.toggle('mobile-visible');
+                overlay.classList.toggle('visible');
+                document.body.style.overflow = sidebar?.classList.contains('mobile-visible') ? 'hidden' : '';
+            }
+        });
+
+        // Close sidebar when clicking overlay (mobile only)
+        overlay.addEventListener('click', () => {
+            if (!isDesktop()) {
+                sidebar?.classList.remove('mobile-visible');
+                overlay.classList.remove('visible');
+                document.body.style.overflow = '';
+            }
+        });
+
+        // Handle window resize
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                if (isDesktop()) {
+                    // On desktop, remove mobile classes and restore desktop state
+                    sidebar?.classList.remove('mobile-visible');
+                    overlay.classList.remove('visible');
+                    document.body.style.overflow = '';
+                } else {
+                    // On mobile, remove desktop collapsed state
+                    if (sidebar?.classList.contains('mobile-visible')) {
+                        overlay.classList.add('visible');
+                        document.body.style.overflow = 'hidden';
+                    }
+                }
+            }, 150);
         });
     }
 

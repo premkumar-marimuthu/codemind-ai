@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <defs>
+    <linearGradient id="grad32" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8b61c2;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7c34db;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="16" cy="16" r="15" fill="url(#grad32)"/>
+  
+  <!-- AI Brain/Circuit design -->
+  <g fill="none" stroke="#ffffff" stroke-width="1" stroke-linecap="round">
+    <!-- Central node -->
+    <circle cx="16" cy="16" r="2.5" fill="#ffffff"/>
+    
+    <!-- Neural connections -->
+    <line x1="16" y1="16" x2="10" y2="10" opacity="0.8"/>
+    <line x1="16" y1="16" x2="22" y2="10" opacity="0.8"/>
+    <line x1="16" y1="16" x2="10" y2="22" opacity="0.8"/>
+    <line x1="16" y1="16" x2="22" y2="22" opacity="0.8"/>
+    
+    <!-- Outer nodes -->
+    <circle cx="10" cy="10" r="1.5" fill="#ffffff"/>
+    <circle cx="22" cy="10" r="1.5" fill="#ffffff"/>
+    <circle cx="10" cy="22" r="1.5" fill="#ffffff"/>
+    <circle cx="22" cy="22" r="1.5" fill="#ffffff"/>
+    
+    <!-- Additional connections -->
+    <line x1="10" y1="10" x2="22" y2="10" opacity="0.5"/>
+    <line x1="10" y1="22" x2="22" y2="22" opacity="0.5"/>
+    <line x1="10" y1="10" x2="10" y2="22" opacity="0.5"/>
+    <line x1="22" y1="10" x2="22" y2="22" opacity="0.5"/>
+    
+    <!-- Corner nodes -->
+    <circle cx="7" cy="16" r="1" fill="#ffffff" opacity="0.7"/>
+    <circle cx="25" cy="16" r="1" fill="#ffffff" opacity="0.7"/>
+    <circle cx="16" cy="7" r="1" fill="#ffffff" opacity="0.7"/>
+    <circle cx="16" cy="25" r="1" fill="#ffffff" opacity="0.7"/>
+  </g>
+</svg>

@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+  <defs>
+    <linearGradient id="grad16" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8b61c2;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7c34db;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="8" cy="8" r="7.5" fill="url(#grad16)"/>
+  
+  <!-- AI Brain/Circuit design (simplified) -->
+  <g fill="none" stroke="#ffffff" stroke-width="0.8" stroke-linecap="round">
+    <!-- Central node -->
+    <circle cx="8" cy="8" r="1.2" fill="#ffffff"/>
+    
+    <!-- Neural connections -->
+    <line x1="8" y1="8" x2="5" y2="5" opacity="0.8"/>
+    <line x1="8" y1="8" x2="11" y2="5" opacity="0.8"/>
+    <line x1="8" y1="8" x2="5" y2="11" opacity="0.8"/>
+    <line x1="8" y1="8" x2="11" y2="11" opacity="0.8"/>
+    
+    <!-- Outer nodes -->
+    <circle cx="5" cy="5" r="0.8" fill="#ffffff"/>
+    <circle cx="11" cy="5" r="0.8" fill="#ffffff"/>
+    <circle cx="5" cy="11" r="0.8" fill="#ffffff"/>
+    <circle cx="11" cy="11" r="0.8" fill="#ffffff"/>
+  </g>
+</svg>
