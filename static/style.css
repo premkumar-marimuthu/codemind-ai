@@ -322,7 +322,7 @@ body.light-theme .sidebar-toggle img {
 
 .top-bar-actions {
     display: flex;
-    align-items: center;
+    /* align-items: center; */
     gap: 16px;
 }
 
@@ -502,6 +502,62 @@ body.light-theme .sidebar-toggle img {
     font-size: 0.88rem;
 }
 
+.code-block-wrapper {
+    margin: 12px 0 0;
+    border-radius: 12px;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    overflow: hidden;
+}
+
+.code-header {
+    padding: 8px 16px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.dark-theme .code-header {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.light-theme .code-header {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+.language-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: var(--accent);
+    color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.dark-theme .language-badge {
+    background: var(--accent);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.light-theme .language-badge {
+    background: var(--accent);
+    box-shadow: 0 2px 6px rgba(102, 126, 234, 0.2);
+}
+
+.code-block-wrapper pre {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    margin: 0;
+    padding: 14px 16px;
+}
+
 .message-content pre {
     background: var(--code-bg);
     border: 1px solid var(--border);
@@ -587,7 +643,6 @@ body.light-theme .sidebar-toggle img {
     bottom: 0;
     background-color: var(--bg-panel);
     box-shadow: 0px -10px 20px var(--shadow-top-bar);
-    overflow-x: hidden;
     will-change: transform;
 }
 
@@ -605,7 +660,6 @@ body.light-theme .sidebar-toggle img {
 .chat-input-container {
     display: flex;
     gap: 10px; /* Space between input bar and send button */
-    max-height: 60px;
 }
 
 .chat-input-bar {
@@ -632,6 +686,9 @@ body.light-theme .sidebar-toggle img {
     font-size: 1rem;
     line-height: 1.5;
     padding: 8px 12px; /* Padding inside the input field */
+    white-space: nowrap; /* Prevent text wrapping */
+    overflow: hidden; /* Hide overflow text */
+    text-overflow: ellipsis; /* Show ellipsis for overflow text */
 }
 
 .chat-input-field:focus {
@@ -661,8 +718,8 @@ body.light-theme .sidebar-toggle img {
 }
 
 .add-button svg {
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     fill: currentColor;
     filter: invert(1); /* Make SVG white in dark theme */
 }
@@ -672,8 +729,8 @@ body.light-theme .add-button svg {
 }
 
 .chat-input-container svg {
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
 }
 
 .send-button {
@@ -762,7 +819,6 @@ body.light-theme .settings-handle-button img {
     gap: 16px;
     max-height: 0;
     opacity: 0;
-    overflow: hidden;
     margin-top: 0;
     pointer-events: none;
     transform: translateY(-6px);

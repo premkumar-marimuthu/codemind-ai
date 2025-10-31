@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const intentOptionsContainer = document.getElementById('intent-options-container');
     const apiKeyInput = document.getElementById('api-key-input');
     const analyzeButton = document.getElementById('analyze-button');
+    const originalAnalyzeButtonContent = analyzeButton.innerHTML;
     const chatLog = document.getElementById('chat-log');
     const statusIndicator = document.getElementById('status-indicator');
     const emptyState = document.getElementById('empty-state');
@@ -765,7 +766,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const assistantMessage = createMessageElement('assistant', 'Cyfer');
         const assistantContent = assistantMessage.querySelector('.message-content');
-        assistantContent.innerHTML = '<p><em>Thinking through your code&hellip;</em></p>';
+        assistantContent.innerHTML = '<p><em>Thinking through your prompt&hellip;</em></p>';
 
         chatState.hasMessages = true;
         hideEmptyState();
@@ -773,8 +774,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         statusIndicator.classList.remove('hidden');
         analyzeButton.disabled = true;
-        analyzeButton.textContent = 'Reviewing...';
-        const originalButtonText = defaultButtonText;
+        analyzeButton.innerHTML = 'Reviewing...';
 
         try {
             const response = await fetch(`/api/chats/${chatState.activeChatId}/messages`, {
@@ -826,7 +826,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } finally {
             statusIndicator.classList.add('hidden');
             analyzeButton.disabled = false;
-            analyzeButton.textContent = originalButtonText;
+            analyzeButton.innerHTML = originalAnalyzeButtonContent;
             chatInput.value = ''; // Changed from codeInput
             chatInput.focus(); // Changed from codeInput
         }
@@ -934,11 +934,89 @@ document.addEventListener('DOMContentLoaded', () => {
 
         return segments.map((segment) => {
             if (segment.type === 'code') {
-                return `<pre><code>${escapeHtml(segment.value.trim())}</code></pre>`;
+                const codeContent = segment.value.trim();
+                const lines = codeContent.split('\n');
+                let language = '';
+                let codeBody = codeContent;
+
+                // Check if the first line is a language identifier
+                if (lines.length > 0) {
+                    const firstLine = lines[0].trim().toLowerCase();
+                    // Common language identifiers
+                    const knownLanguages = [
+                        'python', 'javascript', 'java', 'c', 'cpp', 'c++', 'csharp', 'c#',
+                        'ruby', 'go', 'rust', 'php', 'swift', 'kotlin', 'typescript',
+                        'html', 'css', 'scss', 'sass', 'sql', 'bash', 'shell', 'sh',
+                        'powershell', 'json', 'xml', 'yaml', 'yml', 'markdown', 'md',
+                        'r', 'matlab', 'scala', 'perl', 'lua', 'dart', 'jsx', 'tsx',
+                        'vue', 'react', 'angular', 'svelte'
+                    ];
+
+                    if (knownLanguages.includes(firstLine) && lines.length > 1) {
+                        language = firstLine;
+                        codeBody = lines.slice(1).join('\n').trim();
+                    } else if (firstLine && !firstLine.includes(' ') && firstLine.length < 20 && lines.length > 1) {
+                        // If it's a single word, short, and there's more content, treat it as a language
+                        language = firstLine;
+                        codeBody = lines.slice(1).join('\n').trim();
+                    }
+                }
+
+                // Format language name for display
+                const displayLanguage = formatLanguageName(language);
+                const languageBadge = language 
+                    ? `<div class="code-header"><span class="language-badge">${escapeHtml(displayLanguage)}</span></div>` 
+                    : '';
+
+                return `<div class="code-block-wrapper">${languageBadge}<pre><code>${escapeHtml(codeBody)}</code></pre></div>`;
             }
 
             return textToHtml(segment.value);
         }).join('').trim();
+    }
+
+    function formatLanguageName(lang) {
+        if (!lang) return '';
+        
+        const languageMap = {
+            'javascript': 'JavaScript',
+            'typescript': 'TypeScript',
+            'python': 'Python',
+            'java': 'Java',
+            'cpp': 'C++',
+            'c++': 'C++',
+            'csharp': 'C#',
+            'c#': 'C#',
+            'ruby': 'Ruby',
+            'go': 'Go',
+            'rust': 'Rust',
+            'php': 'PHP',
+            'swift': 'Swift',
+            'kotlin': 'Kotlin',
+            'html': 'HTML',
+            'css': 'CSS',
+            'scss': 'SCSS',
+            'sass': 'Sass',
+            'sql': 'SQL',
+            'bash': 'Bash',
+            'shell': 'Shell',
+            'sh': 'Shell',
+            'powershell': 'PowerShell',
+            'json': 'JSON',
+            'xml': 'XML',
+            'yaml': 'YAML',
+            'yml': 'YAML',
+            'markdown': 'Markdown',
+            'md': 'Markdown',
+            'jsx': 'JSX',
+            'tsx': 'TSX',
+            'vue': 'Vue',
+            'react': 'React',
+            'angular': 'Angular',
+            'svelte': 'Svelte'
+        };
+
+        return languageMap[lang.toLowerCase()] || lang.charAt(0).toUpperCase() + lang.slice(1);
     }
 
     function textToHtml(value) {
