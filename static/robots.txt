@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://chat.kodecyfer.in/sitemap.xml

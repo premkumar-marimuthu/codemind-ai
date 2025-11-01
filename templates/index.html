@@ -7,6 +7,21 @@
     <meta name="theme-color" content="#8b61c2">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="keywords" content="AI assistant, coding helper, writing assistant, research tool, AI technology, Cyfer AI">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://chat.kodecyfer.in/">
+    <meta property="og:title" content="Cyfer - Your AI Assistant">
+    <meta property="og:description" content="Your everyday AI assistant for coding, writing, research, and more. Powered by advanced AI technology.">
+    <meta property="og:image" content="{{ url_for('static', filename='favicon.svg', _external=True) }}">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://chat.kodecyfer.in/">
+    <meta property="twitter:title" content="Cyfer - Your AI Assistant">
+    <meta property="twitter:description" content="Your everyday AI assistant for coding, writing, research, and more. Powered by advanced AI technology.">
+    <meta property="twitter:image" content="{{ url_for('static', filename='favicon.svg', _external=True) }}">
     
     <title>Cyfer - Your AI Assistant</title>
     
@@ -22,6 +37,23 @@
     <!-- Stylesheets -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='switch.css') }}">
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Cyfer",
+      "applicationCategory": "Productivity",
+      "operatingSystem": "Web",
+      "description": "Your everyday AI assistant for coding, writing, research, and more.",
+      "url": "https://chat.kodecyfer.in/",
+      "offers": {
+        "@type": "Offer",
+        "price": "0"
+      }
+    }
+    </script>
 </head>
 <body class="dark-theme">
     <div class="app-shell">
@@ -68,7 +100,7 @@
                         <img
                             id="sidebar-toggle-icon"
                             src="{{ url_for('static', filename='collapse-sidebar.svg') }}"
-                            alt=""
+                            alt="Toggle sidebar"
                             aria-hidden="true"
                         />
                     </button>

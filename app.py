@@ -155,6 +155,16 @@ def index():
     return render_template("index.html", auth_email=session.get("user_email"))
 
 
+@app.route('/robots.txt')
+def robots_txt():
+    return app.send_static_file('robots.txt')
+
+
+@app.route('/sitemap.xml')
+def sitemap_xml():
+    return app.send_static_file('sitemap.xml')
+
+
 @app.route("/api/chats", methods=["GET"])
 def list_chat_sessions():
     user_id = session.get("user_id")
